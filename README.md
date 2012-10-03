@@ -1,4 +1,4 @@
-vanilla
+Vanilla
 =======
 
-Vanilla is a small markup language written to bring markdown ideas to latex
+Vanilla is a small markup language written to bring markdown ideas to latex. The language is under development.
