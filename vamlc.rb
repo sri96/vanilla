@@ -1566,5 +1566,4 @@ def start_compile(input_vaml_file,preferred_directory) #This method starts the c
 
 end
 
-start_compile("C:\\Users\\amma\\Desktop\\sample.vaml","C:\\Users\\amma\\Desktop\\vaml\\")
 
