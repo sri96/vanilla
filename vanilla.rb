@@ -21,7 +21,7 @@
 # 7. Verbatim Mode That Works for Both Latex and VAML
 # 8. VAML Packs
 # 9. VAML Formulas
-# 10. Ruby Scripting - Incomplete implementation 
+# 10. Ruby Scripting - Incomplete implementation
 
 require 'optparse'
 
@@ -86,50 +86,58 @@ def start_compile(input_vaml_file) #This method starts the compilation process
     def find_vaml_file_path(input_path)
 
       #This method is utilized to extract the path of the VAML file.
-	 
-      extension_remover = input_path.split(".vaml")
-	  
+
+      extension_remover = input_path.split(".tex")
+
       remaining_string = extension_remover[0].reverse
-	 
+
       path_finder = remaining_string.index("/")
-	 
-	  remaining_string = remaining_string.reverse
-	 
+
+      remaining_string = remaining_string.reverse
+
       return remaining_string[0...remaining_string.length-path_finder]
 
     end
 
     input_file_as_string = input_file_contents.join
-    
+
+    modified_input_string = input_file_as_string.dup
+
     preferred_directory = find_vaml_file_path(input_vaml_file)
 
     locate_fenced_code_block = find_all_matching_indices(input_file_as_string,"###")
 
     fenced_code_block = []
 
-    replacement_string = "@@(fenced_code_block)[]"
+    start_location = 0
+
+    end_location = 1
 
     if locate_fenced_code_block.length.modulo(2) == 0
 
       for x in 0...locate_fenced_code_block.length/2
 
-        fenced_code_block << input_file_as_string[locate_fenced_code_block[x]..locate_fenced_code_block[x+1]+2]
+        fenced_code_block_string = input_file_as_string[locate_fenced_code_block[start_location]..locate_fenced_code_block[end_location]+2]
 
-        replacement_string = replacement_string.split("]")
+        fenced_code_block << fenced_code_block_string
 
-        replacement_string = replacement_string[0] + "#{x+1}]\n"
+        replacement_string = "@@fenced_code_block[#{x+1}]"
 
-        input_file_as_string = input_file_as_string.sub(fenced_code_block[x],replacement_string)
+        modified_input_string = modified_input_string.sub(fenced_code_block_string,replacement_string)
+
+        start_location = start_location + 2
+
+        end_location = end_location + 2
 
       end
 
     end
 
-    temporary_file_path = find_vaml_file_path(input_vaml_file) + "temp.vaml"
+    temporary_file_path = find_vaml_file_path(input_vaml_file) + "temp.tex"
 
     file_id = open(temporary_file_path, 'w')
 
-    file_id.write(input_file_as_string)
+    file_id.write(modified_input_string)
 
     file_id.close()
 
@@ -587,7 +595,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
           for z in 0...parameter_map.length
 
-             replacement_string = replacement_string.gsub(current_code_block_params[z],parameter_map[current_code_block_params[z]])
+            replacement_string = replacement_string.gsub(current_code_block_params[z],parameter_map[current_code_block_params[z]])
 
           end
 
@@ -640,9 +648,9 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       #This method converts the input list to latex's bmatrix environment offered through amsmath package.
 
-      start_string = "\\begin{bmatrix}"
+      start_string = "$\\begin{bmatrix}"
 
-      end_string = "\\end{bmatrix}"
+      end_string = "\\end{bmatrix}$"
 
       rows = []
 
@@ -840,63 +848,6 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   end
 
-  def resolve_ruby_scripting(input_file_contents,temporary_file_path)
-
-    #There are two kinds of ruby scripts allowed inside a VAML document. One is using \ruby{} command and the other is
-    #through #(rubycode)...#(endrubycode).Please utilize \ruby{} for very simple inline scripts and use #(rubycode) environment
-    #for longer and complex scripts. Both of the scripts are evaluated using Ruby's eval method and are binded. In future
-    #non-binded ruby scripting environments might be available. A detailed scripting guide will be available in the documentation.
-
-    def find_all_matching_indices(input_string,pattern)
-
-      locations = []
-
-      index = input_string.index(pattern)
-
-      while index != nil
-
-        locations << index
-
-        index = input_string.index(pattern,index+1)
-
-
-      end
-
-      return locations
-
-
-    end
-
-    input_file_as_string = input_file_contents.join
-
-    def retrieve_ruby_environment(input_file_string)
-
-      #This retrieves all the use cases of \ruby{} method.
-
-      location_of_ruby_environment = find_all_matching_indices(input_file_string,"\\ruby{")
-
-      for x in 0...location_of_ruby_environment.length
-
-        current_location = location_of_ruby_environment[x]
-
-        extract_string = input_file_string[current_location..-1]
-
-        ruby_environment_end_location = extract_string.index("}")
-
-        ruby_environment_string = input_file_string[current_location..ruby_environment_end_location]
-
-        puts ruby_environment_string
-
-      end
-
-
-    end
-
-    retrieve_ruby_environment(input_file_as_string)
-
-
-  end
-
   def resolve_inline_formatting(input_file_contents,temporary_file_path)
 
     def find_all_matching_indices(input_string,pattern)
@@ -921,9 +872,9 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     document_as_string = input_file_contents.join
 
-    available_formatting = ["**","//","+*","+/"]
+    available_formatting = ["**","///","+*","+/","__"]
 
-    matching_formatting = {"**" => "\\textbf{","//" => "\\emph{" , "+*" => "\\mathbf{" , "+/" => "\\mathit{"}
+    matching_formatting = {"**" => "\\textbf{","///" => "\\emph{" , "+*" => "\\mathbf{" , "+/" => "\\mathit{", "__" => "\\underline{"}
 
     for x in 0...available_formatting.length
 
@@ -1088,6 +1039,22 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     end
 
+    def is_descriptive_list(input_list)
+
+      output = false
+
+      input_list_as_string = input_list.join
+
+      if input_list_as_string.include?("->")
+
+        output = true
+
+      end
+
+      return output
+
+    end
+
     def is_nested_list(input_list)
 
       output = false
@@ -1150,7 +1117,6 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
             current_row = current_row.sub(current_delimiter,"\\item ")
 
-
           end
 
         end
@@ -1164,6 +1130,42 @@ def start_compile(input_vaml_file) #This method starts the compilation process
       input_list_as_string = input_list_as_string.sub("#(list)","\\begin{itemize}")
 
       input_list_as_string = input_list_as_string.sub("#(endlist)","\\end{itemize}")
+
+      return input_list_as_string
+
+    end
+
+    def convert_to_latex_desc_list(input_list)
+
+      descriptive_list_delimiters = ["+ ","- ","* "]
+
+      for x in 0...input_list.length
+
+        current_row = input_list[x]
+
+        for y in descriptive_list_delimiters
+
+          current_delimiter = y
+
+          if current_row.include?(current_delimiter)
+
+            current_row_split = current_row.split("->")
+
+            current_row = current_row_split[0].sub(current_delimiter,"\\item[") + "] " + current_row_split[1]
+
+          end
+
+        end
+
+        input_list[x] = current_row
+
+      end
+
+      input_list_as_string = input_list.join
+
+      input_list_as_string = input_list_as_string.sub("#(list)","\\begin{description}")
+
+      input_list_as_string = input_list_as_string.sub("#(endlist)","\\end{description}")
 
       return input_list_as_string
 
@@ -1235,7 +1237,15 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
             if is_unordered_list(extracted_list)
 
-              replacement_string = convert_to_latex_unord_list(extracted_list)
+              if is_descriptive_list(extracted_list)
+
+                replacement_string = convert_to_latex_desc_list(extracted_list)
+
+              else
+
+                replacement_string = convert_to_latex_unord_list(extracted_list)
+
+              end
 
             elsif is_ordered_list(extracted_list)
 
@@ -1281,7 +1291,15 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
             if is_unordered_list(extracted_list)
 
-              replacement_string = convert_to_latex_unord_list(extracted_list)
+              if is_descriptive_list(extracted_list)
+
+                replacement_string = convert_to_latex_desc_list(extracted_list)
+
+              else
+
+                replacement_string = convert_to_latex_unord_list(extracted_list)
+
+              end
 
             elsif is_ordered_list(extracted_list)
 
@@ -1325,7 +1343,15 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       if is_unordered_list(final_extracted_list)
 
-        output_string = convert_to_latex_unord_list(final_extracted_list)
+        if is_descriptive_list(final_extracted_list)
+
+          output_string = convert_to_latex_desc_list(final_extracted_list)
+
+        else
+
+          output_string = convert_to_latex_unord_list(final_extracted_list)
+
+        end
 
       elsif is_ordered_list(final_extracted_list)
 
@@ -1351,7 +1377,15 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       elsif is_unordered_list(current_list)
 
-        input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_unord_list(current_list))
+        if is_descriptive_list(current_list)
+
+          input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_desc_list(current_list))
+
+        else
+
+          input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_unord_list(current_list))
+
+        end
 
       elsif is_nested_list(current_list)
 
@@ -1375,15 +1409,13 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   def resolve_fenced_code_blocks(input_file_contents,temporary_file_path,fenced_code_blocks)
 
-    fenced_code_block_string = "@@(fenced_code_block)[]"
-
     input_file_as_string = input_file_contents.join
+
+    puts fenced_code_blocks.length
 
     for x in 0...fenced_code_blocks.length
 
-      fenced_code_block_string = fenced_code_block_string.split("]")
-
-      fenced_code_block_string = fenced_code_block_string[0] + "#{x+1}]"
+      fenced_code_block_string = "@@fenced_code_block[#{x+1}]"
 
       replacement_string = fenced_code_blocks[x]
 
@@ -1408,7 +1440,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   end
 
-  def resolve_vaml_packs(input_file_contents,temporary_file,preference_directory)
+  def resolve_tex_packs(input_file_contents,temporary_file,preference_directory)
 
     def find_all_matching_indices(input_string,pattern)
 
@@ -1430,7 +1462,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     end
 
-    default_vamlpack = [
+    default_texpack = [
         "\\usepackage{amsmath,amssymb,amsthm}\n\n",
         "\\usepackage[a4paper,margin = 1in]{geometry}\n\n",
         "\\usepackage{hyperref}\n\n",
@@ -1438,7 +1470,6 @@ def start_compile(input_vaml_file) #This method starts the compilation process
         "\\usepackage{verbatim}\n\n",
         "\\usepackage{booktabs}\n\n",
         "\\usepackage{graphicx}\n\n",
-        "\\usepackage{biblatex}\n\n",
         "\\usepackage{multicol}\n\n",
         "\\usepackage{cleveref}\n\n",
         "\\usepackage{siunitx}\n"]
@@ -1459,7 +1490,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     if !preamble_string.include?("$(importpack)") and !preamble_string.include?("\\usepackage")
 
-      default_vamlpack_string = default_vamlpack.join
+      default_texpack_string = default_texpack.join
 
       documentclass_finder = preamble_string.index("\\documentclass")
 
@@ -1469,7 +1500,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       documentclass_string = extract_string[0..documentclass_end]
 
-      replacement_string = documentclass_string + "\n\n" + default_vamlpack_string + "\n\n"
+      replacement_string = documentclass_string + "\n\n" + default_texpack_string + "\n\n"
 
       preamble_string = preamble_string.sub(documentclass_string,replacement_string)
 
@@ -1495,7 +1526,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
         if !importpack_name.include?("\\")
 
-          importpack_path = preference_directory + importpack_name + ".vamlpack"
+          importpack_path = preference_directory + importpack_name + ".texpack"
 
         else
 
@@ -1503,9 +1534,9 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
         end
 
-        vamlpack_file = read_file_line_by_line(importpack_path).join
+        texpack_file = read_file_line_by_line(importpack_path).join
 
-        preamble_string = preamble_string.sub(importpack_string,vamlpack_file)
+        preamble_string = preamble_string.sub(importpack_string,texpack_file)
 
 
       end
@@ -1525,13 +1556,291 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   end
 
+  def resolve_bare_urls(input_file_contents,temporary_file)
+
+    def find_all_matching_indices(input_string,pattern)
+
+      locations = []
+
+      index = input_string.index(pattern)
+
+      while index != nil
+
+        locations << index
+
+        index = input_string.index(pattern,index+1)
+
+
+      end
+
+      return locations
+
+
+    end
+
+    def modify_urls(input_url_string)
+
+      return_string = "\\url{#{input_url_string}}"
+
+      return return_string
+
+    end
+
+    input_file_as_string = input_file_contents.join
+
+    modified_input_string = input_file_as_string.dup
+
+    url_identifiers = ["http","www"]
+
+    replacements = ["@@http[]","@@www[]"]
+
+    identifier_matches = []
+
+    replacement_strings = []
+
+    for x in 0...url_identifiers.length
+
+      current_identifier = url_identifiers[x]
+
+      current_replacement = replacements[x]
+
+      current_replacement_split = current_replacement.split("]")
+
+      location_of_current_identifer = find_all_matching_indices(input_file_as_string,current_identifier)
+
+      current_identifier_matches = []
+
+      current_replacement_strings = []
+
+      for y in 0...location_of_current_identifer.length
+
+        current_location = location_of_current_identifer[y]
+
+        extract_string = input_file_as_string[current_location..-1]
+
+        url_extract = extract_string.split(" ",2)
+
+        current_identifier_matches << url_extract[0]
+
+        replacement_string = current_replacement_split[0] + (y+1).to_s + "]"
+
+        current_replacement_strings << replacement_string
+
+        modified_input_string = modified_input_string.sub(url_extract[0],replacement_string)
+
+      end
+
+      identifier_matches << current_identifier_matches
+
+      replacement_strings << current_replacement_strings
+
+    end
+
+    for x in 0...identifier_matches.length
+
+      current_identifer_match = identifier_matches[x]
+
+      replacement_string_array = replacement_strings[x]
+
+      for y in 0...current_identifer_match.length
+
+        urls = current_identifer_match[y]
+
+        interim_replacement = replacement_string_array[y]
+
+        replacement_urls = modify_urls(urls)
+
+        modified_input_string = modified_input_string.sub(interim_replacement,replacement_urls)
+
+
+      end
+
+
+    end
+
+    file_id = open(temporary_file, 'w')
+
+    file_id.write(modified_input_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file)
+
+    return line_by_line_contents, temporary_file
+
+  end
+
+  def replace_descriptive_urls(input_file_contents,temporary_file)
+
+    def find_all_matching_indices(input_string,pattern)
+
+      locations = []
+
+      index = input_string.index(pattern)
+
+      while index != nil
+
+        locations << index
+
+        index = input_string.index(pattern,index+1)
+
+
+      end
+
+      return locations
+
+
+    end
+
+    def process_urls(input_string)
+
+      core_string = input_string[2...-1]
+
+      split_string = core_string.split("=>")
+
+      return "\\href{#{split_string[1].strip}}{#{split_string[0].strip}}"
+
+    end
+
+    input_file_as_string = input_file_contents.join
+
+    modified_input_string = input_file_as_string.dup
+
+    descriptive_url_locations = find_all_matching_indices(input_file_as_string,"*[")
+
+    replacement_string = "@@descript[]"
+
+    replacement_urls = []
+
+    replacement_strings = []
+
+    for x in 0...descriptive_url_locations.length
+
+      current_location = descriptive_url_locations[x]
+
+      extract_string = input_file_as_string[current_location..-1]
+
+      end_finder = extract_string.index("]")
+
+      descriptive_url = extract_string[0..end_finder]
+
+      replacement_url = process_urls(descriptive_url)
+
+      replacement_urls << replacement_url
+
+      current_replacement_string = replacement_string.sub("]","#{x+1}]")
+
+      replacement_strings << current_replacement_string
+
+      modified_input_string = modified_input_string.sub(descriptive_url,current_replacement_string)
+
+    end
+
+    to_be_replaced = [replacement_strings,replacement_urls]
+
+    file_id = open(temporary_file, 'w')
+
+    file_id.write(modified_input_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file)
+
+    return line_by_line_contents, temporary_file, to_be_replaced
+
+  end
+
+  def resolve_descriptive_urls(input_file_contents,temporary_file,replacement_array)
+
+    input_file_as_string = input_file_contents.join
+
+    modified_input_string = input_file_as_string.dup
+
+    interim_strings = replacement_array[0]
+
+    descriptive_urls = replacement_array[1]
+
+    for x in 0...interim_strings.length
+
+      current_interim_string = interim_strings[x]
+
+      current_descriptive_url = descriptive_urls[x]
+
+      modified_input_string = modified_input_string.sub(current_interim_string,current_descriptive_url)
+
+    end
+
+    file_id = open(temporary_file, 'w')
+
+    file_id.write(modified_input_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file)
+
+    return line_by_line_contents, temporary_file
+
+  end
+
+  def resolve_double_quotes(input_file_contents,temporary_file)
+
+    def find_all_matching_indices(input_string,pattern)
+
+      locations = []
+
+      index = input_string.index(pattern)
+
+      while index != nil
+
+        locations << index
+
+        index = input_string.index(pattern,index+1)
+
+
+      end
+
+      return locations
+
+
+    end
+
+    input_file_as_string = input_file_contents.join
+
+    modified_input_string = input_file_as_string.dup
+
+    opening_quotes_locations = find_all_matching_indices(input_file_as_string,"\"")
+
+    if opening_quotes_locations.length.modulo(2) == 0
+
+      for x in 0...(opening_quotes_locations.length)/2
+
+        modified_input_string = modified_input_string.sub("\"","``")
+
+        modified_input_string = modified_input_string.sub("\"","''")
+
+      end
+
+    end
+
+    file_id = open(temporary_file, 'w')
+
+    file_id.write(modified_input_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file)
+
+    return line_by_line_contents, temporary_file
+
+  end
+
   def write_latex_file(input_file_contents,temporary_file,input_vaml_file)
 
     input_file_as_string = input_file_contents.join
 
     File.delete(temporary_file)
 
-    output_latex_file_path = input_vaml_file.split(".vaml")
+    output_latex_file_path = input_vaml_file.split(".tex")
 
     output_latex_file_path = output_latex_file_path[0] + ".tex"
 
@@ -1545,6 +1854,8 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   line_by_line_file = read_file_line_by_line(input_vaml_file)
 
+  raw_file = line_by_line_file.dup
+
   line_by_line_file, temp_file, fenced_code_blocks, preferred_directory = replace_fenced_code_block(line_by_line_file,input_vaml_file)
 
   line_by_line_file, temp_file = resolve_comments(line_by_line_file,temp_file)
@@ -1557,87 +1868,43 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   line_by_line_file, temp_file = resolve_inline_calculations(line_by_line_file,temp_file)
 
-  #resolve_ruby_scripting(line_by_line_file,temp_file)
-
   line_by_line_file, temp_file = resolve_inline_formatting(line_by_line_file,temp_file)
 
   line_by_line_file, temp_file = resolve_lists(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
+  line_by_line_file, temp_file = resolve_tex_packs(line_by_line_file,temp_file,preferred_directory)
 
-  line_by_line_file, temp_file = resolve_vaml_packs(line_by_line_file,temp_file,preferred_directory)
+  line_by_line_file, temp_file, replacement_array = replace_descriptive_urls(line_by_line_file,temp_file)
+
+  line_by_line_file, temp_file = resolve_bare_urls(line_by_line_file,temp_file)
+
+  line_by_line_file, temp_file = resolve_descriptive_urls(line_by_line_file,temp_file,replacement_array)
+
+  line_by_line_file, temp_file = resolve_double_quotes(line_by_line_file,temp_file)
+
+  line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
 
   write_latex_file(line_by_line_file,temp_file,input_vaml_file)
 
+  return raw_file
+
 end
 
-#def check_and_compile(file_path)
-#
-#  def read_file_line_by_line(input_path)
-#
-#    #This method returns each line of the vaml file as a list
-#
-#    file_id = open(input_path)
-#
-#    file_line_by_line = file_id.readlines()
-#
-#    file_id.close
-#
-#    return file_line_by_line
-#
-#  end
-#
-#  constant_working_directory = Dir.pwd
-#
-#  vaml_preference_file = constant_working_directory + "/vamlpref.pref"
-#
-#  if File.exist?(vaml_preference_file)
-#
-#    preference_file_contents = read_file_line_by_line(vaml_preference_file)
-#
-#    preference_string = preference_file_contents.join
-#
-#    preferred_directory_locator = preference_string.index("preferred_directory =")
-#
-#    extract_string = preference_string[preferred_directory_locator..-1]
-#
-#    end_locator = extract_string.index("\n")
-#
-#    preferred_directory_string = extract_string[0...end_locator]
-#
-#    preferred_directory_string = preferred_directory_string.strip
-#
-#    start_compile(file_path,preferred_directory_string)
-#
-#  else
-#
-#    puts "It seems like you haven't set your preferences.\n\n You need to set a preferred directory to help me identify your VAML Packs and other upcoming features.\n\n What is your preferred directory?\n\n"
-#
-#    preferred_directory_string = gets
-#
-#    file_id = open(vaml_preference_file,"w")
-#
-#    file_id.write(preferred_directory_string)
-#
-#    file_id.close
-#
-#    preferred_directory_string = preferred_directory_string.strip
-#
-#    start_compile(file_path,preferred_directory_string)
-#
-#  end
-#
-#
-#end
-
 options = {}
+
 OptionParser.new do |opts|
-  opts.banner = "Usage: vanilla [options] VAML_FILE"
+  opts.banner = "Usage: vanilla [options] TEX_FILE"
 
   opts.on("-c", "--compile FILE", "Compile to latex") do |file|
     current_directory = Dir.pwd
     file_path = current_directory + "/" + file
-    start_compile(file_path)
+    raw_file_as_string = start_compile(file_path).join
+    latex_compiler_output = `pdflatex -interaction=nonstopmode #{file}`
+    file_id = open(file_path,'w')
+    file_id.write(raw_file_as_string)
+    file_id.close()
+    puts latex_compiler_output
+
   end
 
 end.parse!
