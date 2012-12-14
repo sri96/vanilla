@@ -9,7 +9,7 @@
 
 @(ftb) = formatted text blocks
 
-#(cftb)[] = [$(capitalize)[formatted text blocks]]
+#(cftb)[] = [$(cap)[formatted text blocks]]
 
 $(importpack)[documentation]
 
@@ -19,25 +19,44 @@ $(importpack)[documentation]
 
 \huge{Vanilla Documentation}\vspace{5pt}
 
-\large{**Adhithya Rajasekaran**}
+\large{**Everything that you need to know about Vanilla**}
 
 \end{center}
 
 \vspace{30pt}
 
+\section*{Copyright}
+
+**\textcopyright Adhithya Rajasekaran, Renuka Rajasekaran, Sri Madhavi Rajasekaran**. All the contents in this document are released under a *[creative commons license =>  http://creativecommons.org/licenses/by-nd/3.0/]. 
+
 \section*{What is Vanilla?}
 
-Vanilla is a powerful LaTex preprocessor. It works based on the DRY(Don't Repeat Yourself) principle. It aims to reduce the entry barrier and learning curve for Latex by simplifying the syntax and also reducing the verbosity of Latex. In this documentation you will learn how to write Vanilla flavoured Latex documents. This document itself is written in Vanilla flavoured Latex. \vspace{5pt}
-
-Let us start off with why I created Vanilla. \vspace{5pt}
+Vanilla is a powerful LaTex preprocessor. It works based on the DRY(Don't Repeat Yourself) principle. It aims to reduce the entry barrier and the learning curve for Latex by simplifying the syntax and also reducing the verbosity of Latex. In this documentation you will learn how to write @(vfl) documents. This document itself is written in @(vfl) \vspace{5pt}
 
 \section*{Why Vanilla?}
 
-I was trying to teach my mom, who is a high school math teacher, to use Latex. I was unsuccessful in that endeavour because my mom found Latex syntax very verbose and she hated the steep learning curve of Latex. I started to wonder if there are any ways to reduce the learning curve of Latex and also reduce the verbosity of Latex. I stumbled across \textbf{Markdown}, a small markup language that compiled into HTML. The syntax of Markdown was very intuitive and short. So I decided to implement a lot of ideas from Markdown into Latex and that's how Vanilla was born. 
+LaTex is a wonderful typesetting system but its reach is limited because of its complexity, verbose syntax and steep learning curve. So @(vfl) is directed towards solving those above mentioned problems. It derives most of its ideas from 
+**Markdown**, a small but powerful markup language. 
+
+\section*{Open Source Project}
+
+The authors of this project have decided to open source the source code of the project. The code is hosted on *[github => https://github.com/adhithyan15/vanilla]. The code is released under MIT License. Please report any bugs to the *[issues => https://github.com/adhithyan15/vanilla/issues?state=open] tab on our github homepage. If you have any new ideas or suggestions, please leave them on the issues tab. We will greatly appreciate your feedback.   
 
 \section*{Technical Details}
 
-Vanilla first started out as a separate markup language with backward compatiblity to Latex. But I dropped that idea and made it as an extension of Latex so that people can keep using their editors. Vanilla compiler prototype was written in Python. Then the code was translated into Ruby and was released as a command line utility.
+Vanilla first started out as a separate markup language with a backward compatiblity to Latex. But it became apparent that there will be not enough interest in creating large amounts of libraries and productivity tools for Vanilla alone. So the authors departed from the idea and made it a preprocessor that incorporated a lot of features from their original markup language idea. \vspace{5pt}
+
+Any LaTex document is a valid @(vfl) document but no @(vfl) document is a valid LaTex document without being processed through the Vanilla. \vspace{5pt}
+
+The original compiler prototype was built using Matlab and then Python for more reachability. The preprocessor grew out of that compiler and was rewritten from scratch in Ruby and is shipped as a commandline utility.\vspace{5pt}
+
+Vanilla builds on top of **PDFLatex**. So it is very important that you have any of the major tex distributions installed on your computer. If you are on windows I recommend *[MikTex => www.miktex.org] and on mac, I recommend *[MacTex => http://tug.org/mactex/]. \vspace{5pt}
+
+\section*{Current State}
+
+The current and stable vanilla release is version 1.0. The release provides a minimal set of base features which might be retained in most of the future releases. Significant amounts of features have been left out either due to bugs or incomplete implementation or not enough testing. They will be released in the upcoming releases. One of the main drawbacks of Vanilla is that it doesn't ship with an **error catcher and notifier**.  So Vanilla will simply ignore the errors and try to compile the error free parts of the document.\vspace{5pt}
+
+The other major disadvantage is that the preprocessor is not available in **Mac or other Unix based platforms** as a bash utility. A full fledged bash/terminal utility will be available in version 2.0.\vspace{5pt}       
 
 \section*{Getting Vanilla}
 
@@ -45,9 +64,9 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 
 \begin{enumerate}
 
-\item Click on ``Download Zip'' to download both the source of the compiler and also the compiled version of the compiler. \vspace{5pt}
+\item Click on "Download Zip" to download both the source of the compiler and also the compiled version of the compiler. \vspace{5pt}
 
-\includegraphics[scale=0.5]{VanillaGithub}
+\includegraphics[scale=0.35]{VanillaGithub}
 
 \item Extract the downloaded zip file using Winzip or any other archive extractor. If you don't have an archive extractor, I recommend *[ 7-zip => www.7zip.org ]
 
@@ -55,19 +74,23 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 
 \begin{itemize}
 
-\item Vanilla.exe  -> This is the primary compiler that will help you compile @(vfl) to **Pure LaTex**. This might be of no use to you if you are running linux or mac. 
-\item Vanilla.rb  ->  This file contains the source code of the compiler. If you are in mac or linux, you can use this file to compile your **Vanilla Flavored LaTex** to LaTex documents.
-\item Readme.md ->  Since the project is hosted in *[ Github => @(github_url) ], Github added a readme file markuped in **Markdown**.
-\item Documentation.pdf ->  This is the same document that you are reading right now. 
-\item Documentation.tex ->  This is the .tex version of documentation written using @(vfl). I highly recommend you to read through this document so that you can get example usages of @(vfl). 
+\item **Vanilla.exe**: This is the primary compiler that will help you compile @(vfl) to **Pure LaTex**. This might be of no use to you if you are running linux or mac. 
+\item **Vanilla.rb**: This file contains the source code of the compiler. If you are in mac or linux, you can use this file to compile your **Vanilla Flavored LaTex** to LaTex documents.
+\item **Readme.md**: Since the project is hosted in *[ Github => @(github_url) ], Github added a readme file markuped in **Markdown**.
+\item **Documentation.pdf**: This is the same document that you are reading right now. 
+\item **Documentation.tex**: This is the .tex version of documentation written using @(vfl). I highly recommend you to read through this document so that you can get example usages of @(vfl). 
 
 \end{itemize}
 
-%{4. If you don't have a LaTex editor, I highly recommend *[ TexMaker => http://www.xm1math.net/texmaker/]. It is the best LaTex editor that I was able to find. In the next section, we will learn how to configure **TexMaker** to use @(vfl).}%
+\item For windows users, please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Adding-Vanilla-to-Path] tutorial to add the Vanilla.exe to your path so that it can be accessed from your commandline prompt. Mac and other Unix based OS users can use the Vanilla.rb to process your @(vfl) documents because a bash/terminal utlity is not yet ready.
+
+\item You are all set. You can compile your @(vfl) documents by calling **"vanilla -c somefile.tex"**. You have to set the directory in which your @(vfl) document is located as your **current directory** for the above command to work.
+
+Please see *[this => https://github.com/adhithyan15/vanilla/wiki/Compiling-Vanilla-Flavored-LaTex-Documents] tutorial to understand what the above phrase is describing.    
  
 \end{enumerate}
 
-Vanilla compiler can work with LaTex Editors. But I request you to not use it because there are some issues which are being worked out. I expect to resolve all the issues by Version 2.0. So please wait until such time.
+Vanilla compiler can work with LaTex Editors. But configuration seems to be a problem. Vanilla is an unconventional preprocessor in which it doesn't have a seperate extension. After the preprocessing stage, Vanilla needs the authority to overwrite the original file and many of the LaTex editors block that kind of action from happening. So a solution is under development. Until such time, you can use Notepad, Notepad++, Wordpad or Sublime Text. 
 
 \section*{Features of Vanilla}
 
@@ -78,8 +101,6 @@ Vanilla compiler can work with LaTex Editors. But I request you to not use it be
 \item **Multiline Comments**: In @(vfl) you can comment out multiple lines of code using matlab style comments. Let us see a quick demo of this feature
 
 ###
-
-%Vanilla Way
 
 %You can comment out multiple lines using matlab style comments %{.....}%
 
@@ -98,11 +119,6 @@ through the following sytax $@(constant\_name) = value$. Note: LaTex has offers 
 version 2.0. 
 
 ###
-
-%Vanilla way
-
-%Vanilla forces you to declare your constants in your preamble so that it will 
-%increase code readability. 
 
 @(vfl) = **Vanilla Flavored LaTex** %must be declared in the preamble
 
@@ -159,7 +175,7 @@ accept a variable as a parameter. Let us take a look into the formulas that ship
 
 \begin{enumerate}
 
-\item **Matrix Formula**: Matrices are very hard to construct in LaTex even with **AMSMATH** package. So @(vfl) ships with a -%\$(matrix)[]-% formula that allows
+\item **Matrix Formula**: Matrices are very hard to construct in LaTex even with **AMSMATH** package. So @(vfl) ships with a %%\$(matrix)[]%% formula that allows
 for the easy creation of matrices. This formula will create a matrix with square brackets around it.Let us do an example 
 
 I want to create a matrix \vspace{5pt}
@@ -178,10 +194,10 @@ A = $(matrix)[1 2 3;4 5 6;7 8 9]
 
 ###  
 
-@(vfl) compiled the -%\$(matrix)[]-% formula into AMSMATH's **bmatrix** environment. 
+@(vfl) compiled the %%\$(matrix)[]%% formula into AMSMATH's **bmatrix** environment. 
 
 \item **Determinant Formula**: Determinants are very similar to matrices except they use a straight line to enclose the contents of the matrix. @(vfl) ships with
-the -%\$(det)[]-% formula that takes care of determinants. Let us see a quick demo of this feature
+the %%\$(det)[]%% formula that takes care of determinants. Let us see a quick demo of this feature
 
 I want to create a determinant \vspace{5pt}
 
@@ -199,28 +215,79 @@ B = $(det)[1 2 3;4 5 6;7 8 9]
 
 ###
 
-@(vfl) compiled the -%\$(det)[]-% formula into AMSMATH's **vmatrix** environment.
+@(vfl) compiled the %%\$(det)[]%% formula into AMSMATH's **vmatrix** environment.
 
 \item **Capitalize Formula**: Capitalize is a fun formula that capitalizes the first letter of every word in a string that is passed to it. Let us see a demo of this feature
 
-###
-
-$(capitalize)[this is a wonderful day] will yield This Is A Wonderful Day 
-
-###
+%%\$(cap)[this is a wonderful day]%% will yield $(cap)[this is a wonderful day]
 
 \end{enumerate}
 
 As you can see that the number of formulas are very limited. Version 2.0 will allow users to create their own formulas using Ruby. 
 
-\item **Inline Calculations**: Inline calculations allow you to perform simple yet powerful calculations with in the document. You can have to nest your calculations inside \#[] 
-to perform the calculations. Let us see some examples
+\item **Inline Calculations**: Inline calculations allow you to perform simple yet powerful calculations with in the document. You can have to nest your calculations inside ![] to perform the calculations. Let us see an example \vspace{5pt}
+
+**%%![5*(45*(60/2))+3]%%** compiles into **![5*(45*(60/2))+3]** 
+
+\item **Inline Formatting**: Formatting is made easy by @(vfl). There are several formatting options provided by @(vfl). We will look at each one of them individually
 
 \begin{enumerate}
 
-\item **-%![5*(45*(60/2))+3]-%** compiles into **![5*(45*(60/2))+3]**.
+\item **Boldface**: You can boldface any text using %%**some text**%% and it will output **some text**.
+
+\item **Italicize**: You can italicize any text using %%///some text///%% and it will output ///some text///.
+
+\item **Underline**: You can underline any text using %%- - -some text- - -%% and it will output ---some text---. 
 
 \end{enumerate}
+
+\item **Tex Packs**:  Tex Packs allow users to abstract away their most used LaTex packages into a file with any name and an extension .texpack. You can then import these Tex Packs into your @(vfl) documents by using %%\$(importpack)[package location]%% in your preamble. Tex Packs are designed to encourage reusability and seperating the structure of the document from the content of the document. The LaTex packages that this document uses have been defined in a texpack called documentation.texpack. Please take a look into that to get an idea of how to write a .texpack. 
+
+There is no special syntax for defining a texpack. You can copy and paste all the usepackage statements into a texpack and import it using the importpack function. 
+
+@(vfl) allows beginners start typesetting documents without worrying about packages. If a document doesn't have any importpack function calls or any usepackage statements, then the preprocessor will automatically add some of the most used packages to the document. The following are the packages provided out of the box by @(vfl).
+
+\begin{enumerate}
+
+\item Amsmath,Amssymb,Amsthm
+
+\item Geometry with A4paper and 1.0in margin
+
+\item Hyperref
+
+\item Xcolor
+
+\item Verbatim
+
+\item Booktabs
+
+\item Multicol
+
+\item Graphicx
+
+\item Siunitx
+
+\item Cleveref
+
+\end{enumerate}
+
+\item **URLs and Hyperlinks**: @(vfl) provides support for two kinds of URLs out of the box. @(vfl) calls them bare urls and descriptive urls. Let us take a look into both of them.
+
+\begin{enumerate}
+
+\item **Bare URLs**: With @(vfl), you can just type in your URL in the document and the preprocessor will automatically find it and convert it into a LaTex hyperlink.Let us see an example
+
+%%http://github.com/adhithyan15%% will become http://github.com/adhithyan15
+
+\item **Descriptive URLs**: Descriptive URLs allow a word or a phrase to be hyperlinked to an URL.@(vfl) comes with a simple syntax to write descriptive URLs easily. The syntax is **%%*[word or phrase =\textgreater URL]%%**.Let us see an example
+
+%%*[blog =\textgreater http://adhithyaraja.wordpress.com]%% will become *[blog => http://adhithyaraja.wordpress.com].  
+
+\end{enumerate}
+
+\item **Double Quotes**: In @(vfl), you can use %%'' ''%% to surround some text with double quotes. For example, %%''hello''%% will produce "hello". 
+
+\item **Undocumented Features**: There are couple of features which were included in the compiler just for the sake of writing this documentation. They are the fenced code block and inline code block. It is not possible to demonstrate their features here because they determine whether a piece of code gets compiled by the preprocessor. You can look inside the source of this document to know how they are used. 
 
 \end{itemize}
 

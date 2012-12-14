@@ -177,7 +177,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     modified_input_string = input_file_as_string.dup
 
-    locate_inline_code_block = find_all_matching_indices(input_file_as_string,"-%")
+    locate_inline_code_block = find_all_matching_indices(input_file_as_string,"%%")
 
     inline_code_block = []
 
@@ -737,7 +737,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       matrix = rows.join(" \\\\\\\\\\\\\\\\ ")
 
-      matrix = start_string + matrix + end_string
+      matrix = "$" + start_string + matrix + end_string + "$"
 
       return matrix
 
@@ -766,7 +766,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       determinant = rows.join(" \\\\\\\\\\\\\\\\ ")
 
-      determinant = start_string + determinant + end_string
+      determinant = "$" + start_string + determinant + end_string + "$"
 
       return determinant
 
@@ -800,7 +800,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     end
 
-    available_formulas = ["$(matrix)","$(det)","$(capitalize)"]
+    available_formulas = ["$(matrix)","$(det)","$(cap)"]
 
     input_file_as_string = input_file_contents.join
 
@@ -902,37 +902,33 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       end
 
-      inline_calculation_start = find_all_matching_indices(operating_row,"![")
-	  	  
-      inline_calculation_end = find_all_matching_indices(operating_row,"]")
-	  
-      if inline_calculation_start.length == inline_calculation_end.length
+      inline_calculation_strings = operating_row.match /!\[.{1,}\]/
 
-        for y in 0...inline_calculation_start.length
+      inline_calculation_strings = inline_calculation_strings.to_a
 
-          inline_calculation_string = operating_row[inline_calculation_start[y]..inline_calculation_end[y]]
+      for y in 0...inline_calculation_strings.length
 
-          inline_calc_ruby_string = inline_calculation_string.dup
+        inline_calculation_string = inline_calculation_strings[y]
 
-          inline_calc_ruby_string = inline_calc_ruby_string[2...-1]
-		  
-		  inline_calc_ruby_string = inline_calc_ruby_string.sub("^","**").to_s()
-		  		  
-          eval_binding = binding
+        inline_calc_ruby_string = inline_calculation_string.dup
 
-          inline_calculation_answer = eval_binding.eval(inline_calc_ruby_string)
+        inline_calc_ruby_string = inline_calc_ruby_string[2...-1]
 
-          inline_calculation_answer = inline_calculation_answer.to_s
+        inline_calc_ruby_string = inline_calc_ruby_string.sub("^","**").to_s()
 
-          if inline_calculation_answer.include?(".")
+        eval_binding = binding
 
-            inline_calculation_answer = inline_calculation_answer.to_f.round(3).to_s
+        inline_calculation_answer = eval_binding.eval(inline_calc_ruby_string)
 
-          end
+        inline_calculation_answer = inline_calculation_answer.to_s
 
-          current_row = current_row.sub(inline_calculation_string,inline_calculation_answer)
+        if inline_calculation_answer.include?(".")
+
+          inline_calculation_answer = inline_calculation_answer.to_f.round(3).to_s
 
         end
+
+        current_row = current_row.sub(inline_calculation_string,inline_calculation_answer)
 
       end
 
@@ -976,9 +972,9 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     document_as_string = input_file_contents.join
 
-    available_formatting = ["**","///","+*","+/","__"]
+    available_formatting = ["**","///","+*","+/","---"]
 
-    matching_formatting = {"**" => "\\textbf{","///" => "\\emph{" , "+*" => "\\mathbf{" , "+/" => "\\mathit{", "__" => "\\underline{"}
+    matching_formatting = {"**" => "\\textbf{","///" => "\\emph{" , "+*" => "\\mathbf{" , "+/" => "\\mathit{", "---" => "\\underline{"}
 
     for x in 0...available_formatting.length
 
@@ -1003,319 +999,6 @@ def start_compile(input_vaml_file) #This method starts the compilation process
     file_id = open(temporary_file_path, 'w')
 
     file_id.write(document_as_string)
-
-    file_id.close()
-
-    line_by_line_contents = read_file_line_by_line(temporary_file_path)
-
-    return line_by_line_contents, temporary_file_path
-
-  end
-
-  def resolve_lists(input_file_contents,temporary_file_path)
-
-    def extract_lists(input_file_contents)
-
-      starting_locations = []
-
-      ending_locations = []
-
-      for x in 0...input_file_contents.length
-
-        current_row = input_file_contents[x]
-
-        if current_row.include?("#(list)")
-
-          if current_row[0].eql?("#")
-
-            starting_locations << x
-
-          end
-
-        elsif current_row.include?("#(endlist)")
-
-          if current_row[0].eql?("#")
-
-            ending_locations << x
-
-          end
-
-        end
-
-      end
-
-      vaml_lists =[]
-
-      if starting_locations.length == ending_locations.length
-
-        for y in 0...starting_locations.length
-
-          current_starting_location = starting_locations[y]
-
-          current_ending_location = ending_locations[y]
-
-          current_list = input_file_contents[current_starting_location..current_ending_location]
-
-          vaml_lists << current_list
-
-
-        end
-
-      end
-
-      return vaml_lists
-
-    end
-
-    def is_ordered_list(input_list)
-
-      output = false
-
-      input_list_as_string = input_list.join
-
-      unordered_list_delimiters = ["+ ","- ","* "]
-
-      number_of_delimiters_found = 0
-
-      if !input_list_as_string.include?("#(nlist)")
-
-        for x in 0...unordered_list_delimiters.length
-
-          current_delimiter = unordered_list_delimiters[x]
-
-          if input_list_as_string.include?(current_delimiter)
-
-            number_of_delimiters_found = number_of_delimiters_found + 1
-
-          end
-
-        end
-
-        if number_of_delimiters_found == 0
-
-          output = true
-
-        end
-
-
-      end
-
-      return output
-
-    end
-
-    def is_unordered_list(input_list)
-
-      output = false
-
-      input_list_as_string = input_list.join
-
-      no_of_ordered_list_elements = 0
-
-      if !input_list_as_string.include?("#(nlist)")
-
-        for x in 0...input_list.length
-
-          current_row = input_list[x]
-
-          if current_row[0].to_i.to_s == current_row[0]
-
-            if current_row[1].eql?(".")
-
-              no_of_ordered_list_elements = no_of_ordered_list_elements + 1
-
-            end
-
-          end
-
-        end
-
-        if no_of_ordered_list_elements == 0
-
-          output = true
-
-        end
-
-
-      end
-
-      return output
-
-    end
-
-    def is_descriptive_list(input_list)
-
-      output = false
-
-      input_list_as_string = input_list.join
-
-      if input_list_as_string.include?("->")
-
-        output = true
-
-      end
-
-      return output
-
-    end
-
-    def is_nested_list(input_list)
-
-      output = false
-
-      input_list_as_string = input_list.join
-
-      if input_list_as_string.include?("#(nlist)")
-
-        output = true
-
-      end
-
-      return output
-
-    end
-
-    def convert_to_latex_ordered_list(input_list)
-
-      for x in 0...input_list.length
-
-        current_row = input_list[x]
-
-        if current_row[0].to_i.to_s == current_row[0]
-
-          if current_row[1].eql?(".")
-
-            current_row[0..1] = "\\item"
-
-          end
-
-        end
-
-        input_list[x] = current_row
-
-      end
-
-      input_list_as_string = input_list.join
-
-      input_list_as_string = input_list_as_string.sub("#(list)","\\begin{enumerate}")
-
-      input_list_as_string = input_list_as_string.sub("#(endlist)","\\end{enumerate}")
-
-      return input_list_as_string
-
-    end
-
-    def convert_to_latex_unord_list(input_list)
-
-      unordered_list_delimiters = ["+ ","- ","* "]
-
-      for x in 0...input_list.length
-
-        current_row = input_list[x]
-
-        for y in unordered_list_delimiters
-
-          current_delimiter = y
-
-          if current_row.include?(current_delimiter)
-
-            current_row = current_row.sub(current_delimiter,"\\item ")
-
-          end
-
-        end
-
-        input_list[x] = current_row
-
-      end
-
-      input_list_as_string = input_list.join
-
-      input_list_as_string = input_list_as_string.sub("#(list)","\\begin{itemize}")
-
-      input_list_as_string = input_list_as_string.sub("#(endlist)","\\end{itemize}")
-
-      return input_list_as_string
-
-    end
-
-    def convert_to_latex_desc_list(input_list)
-
-      descriptive_list_delimiters = ["+ ","- ","* "]
-
-      for x in 0...input_list.length
-
-        current_row = input_list[x]
-
-        for y in descriptive_list_delimiters
-
-          current_delimiter = y
-
-          if current_row.include?(current_delimiter)
-
-            current_row_split = current_row.split("->")
-
-            current_row = current_row_split[0].sub(current_delimiter,"\\item[") + "] " + current_row_split[1]
-
-          end
-
-        end
-
-        input_list[x] = current_row
-
-      end
-
-      input_list_as_string = input_list.join
-
-      input_list_as_string = input_list_as_string.sub("#(list)","\\begin{description}")
-
-      input_list_as_string = input_list_as_string.sub("#(endlist)","\\end{description}")
-
-      return input_list_as_string
-
-    end
-
-    def convert_to_latex_nested_list(input_list)
-
-
-
-    end
-
-    all_lists = extract_lists(input_file_contents)
-
-    input_file_as_string = input_file_contents.join
-
-    for x in all_lists
-
-      current_list = x
-
-      if is_ordered_list(current_list)
-
-        input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_ordered_list(current_list))
-
-      elsif is_unordered_list(current_list)
-
-        if is_descriptive_list(current_list)
-
-          input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_desc_list(current_list))
-
-        else
-
-          input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_unord_list(current_list))
-
-        end
-
-      elsif is_nested_list(current_list)
-
-        input_file_as_string = input_file_as_string.sub(current_list.join,convert_to_latex_nested_list(current_list))
-
-      end
-
-    end
-
-    file_id = open(temporary_file_path, 'w')
-
-    file_id.write(input_file_as_string)
 
     file_id.close()
 
@@ -1814,25 +1497,23 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   line_by_line_file, temp_file = resolve_inline_calculations(line_by_line_file,temp_file)
 
-  #line_by_line_file, temp_file = resolve_inline_formatting(line_by_line_file,temp_file)
+  line_by_line_file, temp_file = resolve_inline_formatting(line_by_line_file,temp_file)
 
-  #line_by_line_file, temp_file = resolve_lists(line_by_line_file,temp_file)
+  line_by_line_file, temp_file = resolve_tex_packs(line_by_line_file,temp_file,preferred_directory)
 
-  #line_by_line_file, temp_file = resolve_tex_packs(line_by_line_file,temp_file,preferred_directory)
+  line_by_line_file, temp_file, replacement_array = replace_descriptive_urls(line_by_line_file,temp_file)
 
-  #line_by_line_file, temp_file, replacement_array = replace_descriptive_urls(line_by_line_file,temp_file)
+  line_by_line_file, temp_file = resolve_bare_urls(line_by_line_file,temp_file)
 
-  #line_by_line_file, temp_file = resolve_bare_urls(line_by_line_file,temp_file)
+  line_by_line_file, temp_file = resolve_descriptive_urls(line_by_line_file,temp_file,replacement_array)
 
-  #line_by_line_file, temp_file = resolve_descriptive_urls(line_by_line_file,temp_file,replacement_array)
+  line_by_line_file, temp_file = resolve_double_quotes(line_by_line_file,temp_file)
 
-  #line_by_line_file, temp_file = resolve_double_quotes(line_by_line_file,temp_file)
+  line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
 
-  #line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
+  line_by_line_file, temp_file = resolve_inline_fenced_code(line_by_line_file,temp_file,inline_code_blocks)
 
-  #line_by_line_file, temp_file = resolve_inline_fenced_code(line_by_line_file,temp_file,inline_code_blocks)
-
-  #write_latex_file(line_by_line_file,temp_file,input_vaml_file)
+  write_latex_file(line_by_line_file,temp_file,input_vaml_file)
 
   return raw_file
 
@@ -1847,11 +1528,11 @@ OptionParser.new do |opts|
     current_directory = Dir.pwd
     file_path = current_directory + "/" + file
     raw_file_as_string = start_compile(file_path).join
-    #latex_compiler_output = `pdflatex -interaction=nonstopmode #{file}`
-    #file_id = open(file_path,'w')
-    #file_id.write(raw_file_as_string)
-    #file_id.close()
-    #puts latex_compiler_output
+    latex_compiler_output = `pdflatex -interaction=nonstopmode #{file}`
+    file_id = open(file_path,'w')
+    file_id.write(raw_file_as_string)
+    file_id.close()
+    puts latex_compiler_output
 
   end
 
