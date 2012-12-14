@@ -18,9 +18,9 @@
 # 4. Inline Simple Calculations With Variables
 # 5. Inline Formatting
 # 6. Easy Lists
-# 7. Verbatim Mode That Works for Both Latex and VAML
-# 8. VAML Packs
-# 9. VAML Formulas
+# 7. Verbatim Mode That Works for Both Latex and Vanilla
+# 8. TEX Packs
+# 9. Vanilla Formulas
 # 10. Ruby Scripting - Incomplete implementation
 
 require 'optparse'
@@ -144,6 +144,76 @@ def start_compile(input_vaml_file) #This method starts the compilation process
     line_by_line_contents = read_file_line_by_line(temporary_file_path)
 
     return line_by_line_contents, temporary_file_path, fenced_code_block,preferred_directory
+
+  end
+
+  def replace_inline_fenced_code(input_file_contents,temporary_file_path)
+
+    #This method will prevent inline vanilla code from being compiled. This will only prevent vanilla code from being
+    #compiled. If the inline code contains LaTex code, then LaTex compiler will compile it into PDF.
+    #This method was mainly written for presenting vanilla code in the vanilla documentation.
+
+    def find_all_matching_indices(input_string,pattern)
+
+      locations = []
+
+      index = input_string.index(pattern)
+
+      while index != nil
+
+        locations << index
+
+        index = input_string.index(pattern,index+1)
+
+
+      end
+
+      return locations
+
+
+    end
+
+    input_file_as_string = input_file_contents.join
+
+    modified_input_string = input_file_as_string.dup
+
+    locate_inline_code_block = find_all_matching_indices(input_file_as_string,"-%")
+
+    inline_code_block = []
+
+    start_location = 0
+
+    end_location = 1
+
+    if locate_inline_code_block.length.modulo(2) == 0
+
+      for x in 0...locate_inline_code_block.length/2
+
+        inline_code_block_string = input_file_as_string[locate_inline_code_block[start_location]..locate_inline_code_block[end_location]+1]
+
+        inline_code_block << inline_code_block_string
+
+        replacement_string = "@@inline_code_block[#{x+1}]"
+
+        modified_input_string = modified_input_string.sub(inline_code_block_string,replacement_string)
+
+        start_location = start_location + 2
+
+        end_location = end_location + 2
+
+      end
+
+    end
+
+    file_id = open(temporary_file_path, 'w')
+
+    file_id.write(modified_input_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file_path)
+
+    return line_by_line_contents, temporary_file_path, inline_code_block
 
   end
 
@@ -665,7 +735,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       end
 
-      matrix = rows.join(" \\\\\\ ")
+      matrix = rows.join(" \\\\\\\\\\\\\\\\ ")
 
       matrix = start_string + matrix + end_string
 
@@ -694,7 +764,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       end
 
-      determinant = rows.join(" \\\\\\ ")
+      determinant = rows.join(" \\\\\\\\\\\\\\\\ ")
 
       determinant = start_string + determinant + end_string
 
@@ -702,7 +772,35 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     end
 
-    available_formulas = ["$(matrix)","$(det)"]
+    def capitalize(input_string)
+
+      #This method will capitalize every single word in a string
+
+      input_string_split = input_string.split
+
+      for x in 0...input_string_split.length
+
+        current_word = input_string_split[x]
+
+        if current_word.length > 1
+
+          current_word = current_word[0].upcase + current_word[1..-1]
+
+        else
+
+          current_word = current_word.upcase
+
+        end
+
+        input_string_split[x] = current_word
+
+      end
+
+      return input_string_split.join(" ")
+
+    end
+
+    available_formulas = ["$(matrix)","$(det)","$(capitalize)"]
 
     input_file_as_string = input_file_contents.join
 
@@ -728,15 +826,21 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
         formula_usage_string_split = formula_usage_string_split[1].split("]")
 
-        formula_usage_string_split = formula_usage_string_split[0].split(";")
-
         if x == 0
+
+          formula_usage_string_split = formula_usage_string_split[0].split(";")
 
           replacement_string = convert_to_matrix(formula_usage_string_split)
 
         elsif x == 1
 
+          formula_usage_string_split = formula_usage_string_split[0].split(";")
+
           replacement_string = convert_to_determinant(formula_usage_string_split)
+
+        elsif x == 2
+
+          replacement_string = capitalize(formula_usage_string_split[0])
 
         end
 
@@ -798,10 +902,10 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
       end
 
-      inline_calculation_start = find_all_matching_indices(operating_row,"#[")
-
+      inline_calculation_start = find_all_matching_indices(operating_row,"![")
+	  	  
       inline_calculation_end = find_all_matching_indices(operating_row,"]")
-
+	  
       if inline_calculation_start.length == inline_calculation_end.length
 
         for y in 0...inline_calculation_start.length
@@ -811,9 +915,9 @@ def start_compile(input_vaml_file) #This method starts the compilation process
           inline_calc_ruby_string = inline_calculation_string.dup
 
           inline_calc_ruby_string = inline_calc_ruby_string[2...-1]
-
-          inline_calc_ruby_string = inline_calc_ruby_string.sub("^","**").to_s()
-
+		  
+		  inline_calc_ruby_string = inline_calc_ruby_string.sub("^","**").to_s()
+		  		  
           eval_binding = binding
 
           inline_calculation_answer = eval_binding.eval(inline_calc_ruby_string)
@@ -1173,193 +1277,7 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     def convert_to_latex_nested_list(input_list)
 
-      endnlist_locations = []
 
-      for x in 0...input_list.length
-
-        current_row = input_list[x]
-
-        if current_row.include?("#(endnlist)")
-
-          endnlist_locations << x
-
-        end
-
-      end
-
-      modified_list = input_list.dup.join
-
-      nlist_locations = []
-
-      for y in endnlist_locations
-
-        extracted_list = input_list[0..y]
-
-        extracted_list = extracted_list.reverse
-
-        for z in 0...extracted_list.length
-
-          current_row = extracted_list[z]
-
-          if current_row.include?("#(nlist)")
-
-            nlist_locations << y-z
-
-          end
-
-        end
-
-      end
-
-      final_replacement_string = ""
-
-      final_extracted_list = []
-
-      nlist_locations = nlist_locations.uniq
-
-      if endnlist_locations.length == nlist_locations.length
-
-        replacement_string = ""
-
-        for x in 0...endnlist_locations.length
-
-          current_end_location = endnlist_locations[x]
-
-          current_start_location = nlist_locations[x]
-
-          extracted_list = input_list[current_start_location..current_end_location]
-
-          extracted_list[0] = extracted_list[0].sub("#(nlist)","#(list)")
-
-          extracted_list[-1] = extracted_list[-1].sub("#(endnlist)","#(endlist)")
-
-          if x == 0
-
-            if is_unordered_list(extracted_list)
-
-              if is_descriptive_list(extracted_list)
-
-                replacement_string = convert_to_latex_desc_list(extracted_list)
-
-              else
-
-                replacement_string = convert_to_latex_unord_list(extracted_list)
-
-              end
-
-            elsif is_ordered_list(extracted_list)
-
-              replacement_string = convert_to_latex_ordered_list(extracted_list)
-
-            end
-
-          else
-
-            nlist_location = []
-
-            endnlist_location = []
-
-            for y in 0...extracted_list.length
-
-              current_row = extracted_list[y]
-
-              if current_row.include?("#(nlist)")
-
-                nlist_location << y
-
-              elsif current_row.include?("#(endnlist)")
-
-                endnlist_location << y
-
-              end
-
-            end
-
-            if nlist_location.length == endnlist_location.length
-
-              if nlist_location.length > 1
-
-                extracted_list[nlist_location[0]..endnlist_location[-1]] = replacement_string
-
-              else
-
-                extracted_list[nlist_location[0]..endnlist_location[0]] = replacement_string
-
-              end
-
-            end
-
-            if is_unordered_list(extracted_list)
-
-              if is_descriptive_list(extracted_list)
-
-                replacement_string = convert_to_latex_desc_list(extracted_list)
-
-              else
-
-                replacement_string = convert_to_latex_unord_list(extracted_list)
-
-              end
-
-            elsif is_ordered_list(extracted_list)
-
-              replacement_string = convert_to_latex_ordered_list(extracted_list)
-
-            end
-
-          end
-
-          final_replacement_string = replacement_string
-
-        end
-
-      end
-
-      nlist_location = []
-
-      endnlist_location = []
-
-      for z in 0...input_list.length
-
-        current_row = input_list[z]
-
-        if current_row.include?("#(nlist)")
-
-          nlist_location << z
-
-        elsif current_row.include?("#(endnlist)")
-
-          endnlist_location << z
-
-        end
-
-      end
-
-      final_extracted_list = input_list.dup
-
-      final_extracted_list[nlist_location[0]..endnlist_location[-1]] = final_replacement_string
-
-      output_string = ""
-
-      if is_unordered_list(final_extracted_list)
-
-        if is_descriptive_list(final_extracted_list)
-
-          output_string = convert_to_latex_desc_list(final_extracted_list)
-
-        else
-
-          output_string = convert_to_latex_unord_list(final_extracted_list)
-
-        end
-
-      elsif is_ordered_list(final_extracted_list)
-
-        output_string = convert_to_latex_ordered_list(final_extracted_list)
-
-      end
-
-      return output_string
 
     end
 
@@ -1411,8 +1329,6 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
     input_file_as_string = input_file_contents.join
 
-    puts fenced_code_blocks.length
-
     for x in 0...fenced_code_blocks.length
 
       fenced_code_block_string = "@@fenced_code_block[#{x+1}]"
@@ -1439,6 +1355,34 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
 
   end
+
+  def resolve_inline_fenced_code(input_file_contents,temporary_file_path,inline_code_blocks)
+
+    input_file_as_string = input_file_contents.join
+
+    for x in 0...inline_code_blocks.length
+
+      fenced_code_block_string = "@@inline_code_block[#{x+1}]"
+
+      replacement_string = inline_code_blocks[x]
+
+      input_file_as_string = input_file_as_string.sub(fenced_code_block_string,replacement_string[2...-2])
+
+    end
+
+    file_id = open(temporary_file_path, 'w')
+
+    file_id.write(input_file_as_string)
+
+    file_id.close()
+
+    line_by_line_contents = read_file_line_by_line(temporary_file_path)
+
+    return line_by_line_contents, temporary_file_path
+
+
+  end
+
 
   def resolve_tex_packs(input_file_contents,temporary_file,preference_directory)
 
@@ -1858,6 +1802,8 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   line_by_line_file, temp_file, fenced_code_blocks, preferred_directory = replace_fenced_code_block(line_by_line_file,input_vaml_file)
 
+  line_by_line_file, temp_file, inline_code_blocks  = replace_inline_fenced_code(line_by_line_file,temp_file)
+
   line_by_line_file, temp_file = resolve_comments(line_by_line_file,temp_file)
 
   line_by_line_file, temp_file = resolve_constants(line_by_line_file, temp_file)
@@ -1868,23 +1814,25 @@ def start_compile(input_vaml_file) #This method starts the compilation process
 
   line_by_line_file, temp_file = resolve_inline_calculations(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_inline_formatting(line_by_line_file,temp_file)
+  #line_by_line_file, temp_file = resolve_inline_formatting(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_lists(line_by_line_file,temp_file)
+  #line_by_line_file, temp_file = resolve_lists(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_tex_packs(line_by_line_file,temp_file,preferred_directory)
+  #line_by_line_file, temp_file = resolve_tex_packs(line_by_line_file,temp_file,preferred_directory)
 
-  line_by_line_file, temp_file, replacement_array = replace_descriptive_urls(line_by_line_file,temp_file)
+  #line_by_line_file, temp_file, replacement_array = replace_descriptive_urls(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_bare_urls(line_by_line_file,temp_file)
+  #line_by_line_file, temp_file = resolve_bare_urls(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_descriptive_urls(line_by_line_file,temp_file,replacement_array)
+  #line_by_line_file, temp_file = resolve_descriptive_urls(line_by_line_file,temp_file,replacement_array)
 
-  line_by_line_file, temp_file = resolve_double_quotes(line_by_line_file,temp_file)
+  #line_by_line_file, temp_file = resolve_double_quotes(line_by_line_file,temp_file)
 
-  line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
+  #line_by_line_file, temp_file = resolve_fenced_code_blocks(line_by_line_file,temp_file,fenced_code_blocks)
 
-  write_latex_file(line_by_line_file,temp_file,input_vaml_file)
+  #line_by_line_file, temp_file = resolve_inline_fenced_code(line_by_line_file,temp_file,inline_code_blocks)
+
+  #write_latex_file(line_by_line_file,temp_file,input_vaml_file)
 
   return raw_file
 
@@ -1899,11 +1847,11 @@ OptionParser.new do |opts|
     current_directory = Dir.pwd
     file_path = current_directory + "/" + file
     raw_file_as_string = start_compile(file_path).join
-    latex_compiler_output = `pdflatex -interaction=nonstopmode #{file}`
-    file_id = open(file_path,'w')
-    file_id.write(raw_file_as_string)
-    file_id.close()
-    puts latex_compiler_output
+    #latex_compiler_output = `pdflatex -interaction=nonstopmode #{file}`
+    #file_id = open(file_path,'w')
+    #file_id.write(raw_file_as_string)
+    #file_id.close()
+    #puts latex_compiler_output
 
   end
 
