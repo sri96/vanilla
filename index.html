@@ -1,59 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Vanilla by adhithyan15</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Vanilla by adhithyan15</title>
   </head>
+
   <body>
 
-      <header>
+    <header>
+      <div class="container">
         <h1>Vanilla</h1>
-        <p>Vanilla is a super awesome extension of LaTex Typesetting System</p>
-      </header>
+        <h2>Vanilla is a simple yet power preprocessor for LaTex</h2>
 
-      <div id="banner">
-        <span id="logo"></span>
+        <section id="downloads">
+          <a href="https://github.com/adhithyan15/vanilla/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/adhithyan15/vanilla/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/adhithyan15/vanilla" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
-        <a href="https://github.com/adhithyan15/vanilla" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/adhithyan15/vanilla/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/adhithyan15/vanilla/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
+    <div class="container">
+      <section id="main_content">
         <h3>Welcome to Vanilla</h3>
 
-<p>Vanilla is a super awesome extension of LaTex that aims to reduce the learning curve of LaTex and reduce verbosity in the LaTex code. It enhances a lot of features available in LaTex and adds features on top of it to enhance productivity of LaTex users. It was greatly inspired by Markdown, Less CSS, Ruby and Matlab. Read the documentation to know more about Vanilla. </p>
+<p>Vanilla is a powerful LaTex preprocessor. It works based on the DRY(Don't Repeat Yourself) principle. It aims to reduce the entry barrier and the learning curve for Latex by simplifying the syntax and also reducing the verbosity of Latex. </p>
 
 <h3>Technical Details</h3>
 
-<p>Vanilla compiler was originally conceived and written in Python. It was then translated into Ruby. The compiler is built on top of PDFLatex and PDFLatex is a dependency for Vanilla. The command line utility is aimed towards Windows platform but technically it is  a cross platform product. Please read the documentation to know more about the internal workings of the compiler. A debugger and error corrector are being written and will be released in Version 2.   </p>
+<p>Vanilla first started out as a separate markup language with a backward compatiblity to Latex. But it became apparent that there will be not enough interest in creating large amounts of libraries and productivity tools for Vanilla alone. So the authors departed from the idea and made it a preprocessor that incorporated a lot of features from their original markup language idea.</p>
+
+<p>Any LaTex document is a valid Vanilla document but no Vanilla document is a valid LaTex document without being processed through the Vanilla. </p>
+
+<p>The original compiler prototype was built using Matlab and then Python for more reachability. The preprocessor grew out of that compiler and was rewritten from scratch in Ruby and is shipped as a command line utility.</p>
+
+<p>Vanilla builds on top of <strong>PDFLatex</strong>. So it is very important that you have any of the major Tex distributions installed on your computer.</p>
 
 <h3>Documentation</h3>
 
-<p>Documentation is provided in the repo itself. The documentation is very extensive.  So please read through it for more information regarding all the topics. </p>
+<p>The repo comes with the documentation in a file called documentation.pdf.</p>
 
 <h3>Authors and Contributors</h3>
 
-<p>Written by Adhithya Rajasekaran (<a href="https://github.com/adhithyan15" class="user-mention">@adhithyan15</a>) and his sister Sri Madhavi Rajasekaran. Adhithya's mother Renuka Rajasekaran provided guidance and advice for this project. The project needs contributors. So if you are interested, please email Adhithya at the address listed below. </p>
+<p>Authors: Adhithya Rajasekaran, Renuka Rajasekaran, Sri Madhavi Rajasekaran
+Contributors: None. If you are interested in helping out, you are more than welcome. </p>
 
 <h3>Licensing</h3>
 
@@ -63,12 +59,8 @@
 
 <p>If you find a bug, please post an issue and it will be resolved as soon as possible. You can contact Adhithya at adhithyan15 at gmail dotcom. </p>
       </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/adhithyan15">adhithyan15</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
-      </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
