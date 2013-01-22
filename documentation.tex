@@ -56,8 +56,6 @@ Vanilla builds on top of **PDFLatex**. So it is very important that you have any
 
 The current and stable vanilla release is version 1.0. The release provides a minimal set of base features which might be retained in most of the future releases. Significant amounts of features have been left out either due to bugs or incomplete implementation or not enough testing. They will be released in the upcoming releases. One of the main drawbacks of Vanilla is that it doesn't ship with an **error catcher and notifier**.  So Vanilla will simply ignore the errors and try to compile the error free parts of the document.\vspace{5pt}
 
-The other major disadvantage is that the preprocessor is not available in **Mac or other Unix based platforms** as a bash utility. A full fledged bash/terminal utility will be available in version 2.0.\vspace{5pt}       
-
 \section*{Getting Vanilla}
 
 It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and follow the steps below. 
@@ -66,7 +64,7 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 
 \item Click on "Download Zip" to download both the source of the compiler and also the compiled version of the compiler. \vspace{5pt}
 
-\includegraphics[scale=0.35]{VanillaGithub}
+\includegraphics[scale = 0.35]{VanillaGithub}
 
 \item Extract the downloaded zip file using Winzip or any other archive extractor. If you don't have an archive extractor, I recommend *[ 7-zip => www.7zip.org ]
 
@@ -74,17 +72,18 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 
 \begin{itemize}
 
-\item **Vanilla.exe**: This is the primary compiler that will help you compile @(vfl) to **Pure LaTex**. This might be of no use to you if you are running linux or mac. 
-\item **Vanilla.rb**: This file contains the source code of the compiler. If you are in mac or linux, you can use this file to compile your **Vanilla Flavored LaTex** to LaTex documents.
+\item **bin**: The bin directory contains **Vanilla.exe**,**Vanilla**,and **Vanilla.rb** files. **Vanilla.exe** is the primary compiler for the windows platform and **Vanilla** is the primary compiler for the unix platform. **Vanilla.rb** file contains the ruby source code of the compiler. 
+\item **Old Compiler Prototypes**: This directory contains the prototype compilers written in Python and Matlab. Those have been open sourced just for reference purposes. 
 \item **Readme.md**: Since the project is hosted in *[ Github => @(github_url) ], Github added a readme file markuped in **Markdown**.
+\item **VanillaGithub.jpg**: A screenshot of http://adhithyan15.github.com/vanilla page. 
 \item **Documentation.pdf**: This is the same document that you are reading right now. 
 \item **Documentation.tex**: This is the .tex version of documentation written using @(vfl). I highly recommend you to read through this document so that you can get example usages of @(vfl). 
 
 \end{itemize}
 
-\item For windows users, please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Adding-Vanilla-to-Path] tutorial to add the Vanilla.exe to your path so that it can be accessed from your commandline prompt. Mac and other Unix based OS users can use the Vanilla.rb to process your @(vfl) documents because a bash/terminal utlity is not yet ready.
+\item For windows users, please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Adding-Vanilla-to-Path] tutorial to add the Vanilla.exe to your path so that it can be accessed from your commandline prompt. Mac and other Unix based OS please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Getting-Started-With-Vanilla-Mac-and-Unix] tutorial to add the utility to your terminal/bash. 
 
-\item You are all set. You can compile your @(vfl) documents by calling **"vanilla -c somefile.tex"**. You have to set the directory in which your @(vfl) document is located as your **current directory** for the above command to work.
+\item You are all set. You can compile your @(vfl) documents by calling **"vanilla --compile somefile.tex"**. You have to set the directory in which your @(vfl) document is located as your **current directory** for the above command to work.
 
 Please see *[this => https://github.com/adhithyan15/vanilla/wiki/Compiling-Vanilla-Flavored-LaTex-Documents] tutorial to understand what the above phrase is describing.    
  
@@ -221,6 +220,15 @@ B = $(det)[1 2 3;4 5 6;7 8 9]
 
 %%\$(cap)[this is a wonderful day]%% will yield $(cap)[this is a wonderful day]
 
+\item **Image Formula**: Image formula adds support for utilizing images from any part of the computer. By default, LaTex requires images that need to included in the PDF to be present in the same directory as the .tex file. This was believed to cause additional unnecessary work in the part of user. So the formula allows any image from any part of the computer to be used in a .tex file. The formula takes the path of the image and a ruby styled hash of options to manipulate the image. Currently **:scale**,**:width**,**:height**,**:angle** and **:page** options are supported.  
+###
+Example Usage: 
+
+$(image)[C:\Users\Adhi\Desktop\sample.jpg,options = {:scale => 0.35}]
+
+###
+This resolves *[issue 10 => https://github.com/adhithyan15/vanilla/issues/10] on project page.  
+
 \end{enumerate}
 
 As you can see that the number of formulas are very limited. Version 2.0 will allow users to create their own formulas using Ruby. 
@@ -237,7 +245,9 @@ As you can see that the number of formulas are very limited. Version 2.0 will al
 
 \item **Italicize**: You can italicize any text using %%///some text///%% and it will output ///some text///.
 
-\item **Underline**: You can underline any text using %%- - -some text- - -%% and it will output ---some text---. 
+\item **Underline**: You can underline any text using **three underscores** on either side. Example: ___some text___ .
+
+\item **Strikeout**: You can strikeout any text using **three tildes**. Example: ~~~2012~~~2013. 
 
 \end{enumerate}
 
@@ -250,6 +260,8 @@ There is no special syntax for defining a texpack. You can copy and paste all th
 \begin{enumerate}
 
 \item Amsmath,Amssymb,Amsthm
+
+\item Ulem with Normalem
 
 \item Geometry with A4paper and 1.0in margin
 
@@ -271,6 +283,14 @@ There is no special syntax for defining a texpack. You can copy and paste all th
 
 \end{enumerate}
 
+\item **Smarty Pants Features**: These features were inspired by *[Smarty Pants => http://daringfireball.net/projects/smartypants/].
+
+\begin{enumerate}
+
+\item **Ellipses**: You can use %%....%% to insert ellipses anywhere. @(vfl) will be compiled to LaTex's ldots command. For example %%To be continued ....%% will become To be continuted ....
+
+\end{enumerate}
+
 \item **URLs and Hyperlinks**: @(vfl) provides support for two kinds of URLs out of the box. @(vfl) calls them bare urls and descriptive urls. Let us take a look into both of them.
 
 \begin{enumerate}
@@ -285,7 +305,9 @@ There is no special syntax for defining a texpack. You can copy and paste all th
 
 \end{enumerate}
 
-\item **Double Quotes**: In @(vfl), you can use %%'' ''%% to surround some text with double quotes. For example, %%''hello''%% will produce "hello". 
+\item **Double Quotes**: In @(vfl), you can use %%'' ''%% to surround some text with double quotes. For example, %%''hello''%% will produce "hello".
+
+\item **Building Vanilla from Source**: You can build Vanilla executable from source using Ruby.**This only works in windows**. Make sure that you have **Ocra** gem installed. Make the bin folder the current directory. Then call "ruby vanilla.rb -b file". This will make a new windows and unix executable.   
 
 \item **Undocumented Features**: There are couple of features which were included in the compiler just for the sake of writing this documentation. They are the fenced code block and inline code block. It is not possible to demonstrate their features here because they determine whether a piece of code gets compiled by the preprocessor. You can look inside the source of this document to know how they are used. 
 
