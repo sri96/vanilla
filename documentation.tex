@@ -9,6 +9,12 @@
 
 @(ftb) = formatted text blocks
 
+@(test) = 15
+
+@(testy) = 27
+
+@(test1) = 17 + @(test) + @(testy)
+
 #(cftb)[] = [$(cap)[formatted text blocks]]
 
 $(importpack)[documentation]
@@ -50,7 +56,7 @@ Any LaTex document is a valid @(vfl) document but no @(vfl) document is a valid 
 
 The original compiler prototype was built using Matlab and then Python for more reachability. The preprocessor grew out of that compiler and was rewritten from scratch in Ruby and is shipped as a commandline utility.\vspace{5pt}
 
-Vanilla builds on top of **PDFLatex**. So it is very important that you have any of the major tex distributions installed on your computer. If you are on windows I recommend *[MikTex => www.miktex.org] and on mac, I recommend *[MacTex => http://tug.org/mactex/]. \vspace{5pt}
+Vanilla builds on top of **PDFLatex**. So it is very important that you have any of the major tex distributions installed on your computer. If you are on windows we recommend *[MikTex => www.miktex.org] and on mac, we recommend *[MacTex => http://tug.org/mactex/]. \vspace{5pt}
 
 \section*{Current State}
 
@@ -66,7 +72,7 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 
 \includegraphics[scale = 0.35]{VanillaGithub}
 
-\item Extract the downloaded zip file using Winzip or any other archive extractor. If you don't have an archive extractor, I recommend *[ 7-zip => www.7zip.org ]
+\item Extract the downloaded zip file using Winzip or any other archive extractor. If you don't have an archive extractor, we recommend *[ 7-zip => www.7zip.org ]
 
 \item Once you extract it, you will find the following files inside the folder you extracted
 
@@ -77,13 +83,14 @@ It is very easy to get Vanilla. Visit www.adhithyan15.github.com/vanilla/ and fo
 \item **Readme.md**: Since the project is hosted in *[ Github => @(github_url) ], Github added a readme file markuped in **Markdown**.
 \item **VanillaGithub.jpg**: A screenshot of http://adhithyan15.github.com/vanilla page. 
 \item **Documentation.pdf**: This is the same document that you are reading right now. 
-\item **Documentation.tex**: This is the .tex version of documentation written using @(vfl). I highly recommend you to read through this document so that you can get example usages of @(vfl). 
+\item **Documentation.tex**: This is the .tex version of documentation written using @(vfl). I highly recommend you to read through this document so that you can get example usages of @(vfl).
+\item **Documentation.log**: Log file produced by **LaTex** when the file is being compiled to PDF.  
 
 \end{itemize}
 
 \item For windows users, please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Adding-Vanilla-to-Path] tutorial to add the Vanilla.exe to your path so that it can be accessed from your commandline prompt. Mac and other Unix based OS please follow *[this => https://github.com/adhithyan15/vanilla/wiki/Getting-Started-With-Vanilla-Mac-and-Unix] tutorial to add the utility to your terminal/bash. 
 
-\item You are all set. You can compile your @(vfl) documents by calling **"vanilla --compile somefile.tex"**. You have to set the directory in which your @(vfl) document is located as your **current directory** for the above command to work.
+\item You are all set. You can compile your @(vfl) documents by calling **"vanilla -~-compile somefile.tex"**. You have to set the directory in which your @(vfl) document is located as your **current directory** for the above command to work.
 
 Please see *[this => https://github.com/adhithyan15/vanilla/wiki/Compiling-Vanilla-Flavored-LaTex-Documents] tutorial to understand what the above phrase is describing.    
  
@@ -101,7 +108,7 @@ Vanilla compiler can work with LaTex Editors. But configuration seems to be a pr
 
 ###
 
-%You can comment out multiple lines using matlab style comments %{.....}%
+%You can comment out multiple lines using %{.....}%
 
 %{Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris placerat tristique purus, 
 non tempus mi ultrices in. Praesent lobortis erat et lorem commodo mollis. Pellentesque 
@@ -123,13 +130,24 @@ version 2.0.
 
 %Usage
 
-Welcome to @(vfl) %should output Welcome to \textbf{Vanilla Flavored LaTex} 
+Welcome to @(vfl) %should output Welcome to \textbf{Vanilla Flavored LaTex}
 
 ###
 
-Vanilla compiler doesn't compile the Vanilla constants into LaTex variables. Instead, it converts them into plain text so that they can be used in a variety of purposes.  
-Since the constants are rendered into plain text all the you can pass in a variable to most of the features listed below. 
+Constants now support what is known as a **Computed Property**. You can build new constants from other constants. An example is provided below
 
+###
+
+@(test) = 15
+
+@(testy) = 27
+
+@(test1) = 17 + @(test) + @(testy)
+
+###
+
+That should output @(test1). **Computed Properties** features currently doesn't support string concatenation. But it will be improved as time goes on. This addition resolves *[issue 15 => https://github.com/adhithyan15/vanilla/issues/15] on project page. Vanilla compiler doesn't compile the Vanilla constants into LaTex variables. Instead, it converts them into plain text so that they can be used in a variety of purposes.  
+Since the constants are rendered into plain text all the you can pass in a variable to most of the features listed below. 
 \item **Formatted Text Blocks**: #(cftb)[] were inspired by Less CSS' parametric mixins. #(cftb)[] can include any kind of LaTex or @(vfl) formatting. 
 @(vfl) forces the @(ftb) to be declared inside preamble to increase readability and @(ftb) are immutable. Mutable @(ftb) are under development and they will be released in version 2.0. 
 
@@ -312,5 +330,37 @@ There is no special syntax for defining a texpack. You can copy and paste all th
 \item **Undocumented Features**: There are couple of features which were included in the compiler just for the sake of writing this documentation. They are the fenced code block and inline code block. It is not possible to demonstrate their features here because they determine whether a piece of code gets compiled by the preprocessor. You can look inside the source of this document to know how they are used. 
 
 \end{itemize}
+
+The project is licensed under MIT License. You can read the text of the license below.
+
+\vspace{5pt} 
+
+**License**: Copyright 2013 Adhithya Rajasekaran, Renuka Rajasekaran, Sri Madhavi Rajasekaran and other contributors
+http://adhithyan15.github.com/vanilla
+
+\vspace{5pt}
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+\vspace{5pt}
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+\vspace{5pt}
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 \end{document}

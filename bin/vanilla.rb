@@ -283,6 +283,9 @@ def start_compile(input_val_file) #This method starts the compilation process
     #Pure mutable variables may be available in VAL in the future. Lexical Scoping of constants is similar to that in
     #programming languages. This would be imminent in the code block resolution method.
 
+    #Updates 2/16/2012 -> Constants now support what our user called "Computed Properties". So users can now include
+    #calculations and reference other constants while declaring constants.
+
     def retrieve_constants(input_file_contents)
 
       #This method looks into the preamble of the document and picks up all the constant declarations. Then it splits and
@@ -377,7 +380,39 @@ def start_compile(input_val_file) #This method starts the compilation process
 
       end
 
-      return variable_names, variable_values, modified_preamble
+      modified_variable_values = []
+
+      variable_values.each do |value|
+
+        if value.include? "@("
+
+          new_value = value.dup
+
+          variable_names.each do |name|
+
+            if new_value.include? name
+
+              new_value = new_value.sub(name,variable_values[variable_names.index(name)])
+
+            end
+
+          end
+
+          ruby_binding = binding
+
+          val = ruby_binding.eval(new_value).to_s
+
+          modified_variable_values << val
+
+        else
+
+          modified_variable_values << value
+
+        end
+
+      end
+
+      return variable_names, modified_variable_values, modified_preamble
 
     end
 
