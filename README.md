@@ -1,10 +1,29 @@
-Vanilla
-=======
+# Vfl
 
-Vanilla is a small yet powerful LaTex preprocessor written in Ruby. 
+TODO: Write a gem description
 
-**Authors: Adhithya Rajasekaran, Renuka Rajasekaran and Sri Madhavi Rajasekaran**
+## Installation
 
-Read the documentation to know more. 
+Add this line to your application's Gemfile:
 
-MIT Licensed
+    gem 'vfl'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install vfl
+
+## Usage
+
+TODO: Write usage instructions here
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request

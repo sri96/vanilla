@@ -1767,6 +1767,32 @@ def create_executable(input_file)
 
 end
 
+def create_mac_executable(input_file)
+
+  def read_file_line_by_line(input_path)
+
+    file_id = open(input_path)
+
+    file_line_by_line = file_id.readlines()
+
+    file_id.close
+
+    return file_line_by_line
+
+  end
+
+  mac_file_contents = ["#!/usr/bin/env ruby\n\n"] + read_file_line_by_line(input_file)
+
+  mac_file_path = input_file.sub(".rb", "")
+
+  file_id = open(mac_file_path, "w")
+
+  file_id.write(mac_file_contents.join)
+
+  file_id.close
+
+end
+
 options = {}
 
 OptionParser.new do |opts|
@@ -1780,17 +1806,15 @@ OptionParser.new do |opts|
 
   end
 
-  opts.on("-ch", "--check FILE", "Syntax Check") do |file|
-
-    puts "Under Development"
-
-  end
-
   opts.on("-b", "--build FILE", "Builds Itself") do |file|
 
-    file_path = Dir.pwd + "/vanilla.rb"
+    file_path = Dir.pwd + "/src/vanilla.rb"
 
-    create_executable(file_path)
+    create_mac_executable(file_path)
+
+    FileUtils.mv("#{file_path[0...-3]}", "#{Dir.pwd}/bin/vanilla")
+
+    puts "Build Successful!"
 
   end
 
