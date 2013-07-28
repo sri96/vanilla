@@ -1,24 +1,22 @@
-# Vfl
+# Vanilla
 
-TODO: Write a gem description
+Vanilla is a small yet powerful LaTex preprocessor written in Ruby. It reduces verbosity and improves productivity when using LaTex.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'vfl'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+You can install Vanilla yourself by running:
 
     $ gem install vfl
 
 ## Usage
 
-TODO: Write usage instructions here
+To compile a **Vanilla Flavored Latex** file, just run
+
+    $ vanilla --compile file.latex
+
+## Documentation
+
+You can read the documentation of the preprocessor in the file named **"Documentation.pdf"**. The source of the documentation is written in Vanilla itself and provided as a reference. 
 
 ## Contributing
 
@@ -27,3 +25,7 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## License
+
+The project is released under MIT License.
