@@ -29,3 +29,5 @@ You can read the documentation of the preprocessor in the file named **"Document
 ## License
 
 The project is released under MIT License.
+
+Authors: Adhithya Rajasekaran and Sri Madhavi Rajasekaran
